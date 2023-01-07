@@ -1,12 +1,15 @@
 # 🌊 Nostrum
-
 Keep your Nostr keys safe. 
-
 
 ## 📖 About
 
 Nostrum it's a mobile app that allows you to sign transactions and messages with your Nostr keys. 
 Nostrum is the reference implementation for a remote signer app (ie. Wallet) of the [Nostr Connect](https://github.com/nostr-connect/nips/blob/nostr-connect/nip-nostr-connect.md) protocol.
+
+
+## ⛹️‍♀️ Demo
+https://user-images.githubusercontent.com/3596602/211125690-a16d0d3d-d010-44b2-85e3-94b4e9f476c7.mp4
+
 
 
 
