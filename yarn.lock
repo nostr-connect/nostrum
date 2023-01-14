@@ -1835,10 +1835,10 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@nostr-connect/connect@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@nostr-connect/connect/-/connect-0.1.0.tgz#0f5537237d63e328922b9b13b97d98da53cc3bd4"
-  integrity sha512-YcQvkvMEdWBFy1tnPJhuS+wNK+W1EOz0vdOeIth6KezdSKS+yTHoR/jV58nQdRLvmiAIAIr+ZY/gYTztFddiUA==
+"@nostr-connect/connect@^0.1.4":
+  version "0.1.4"
+  resolved "https://registry.yarnpkg.com/@nostr-connect/connect/-/connect-0.1.4.tgz#b89d2ad2a192221302052b2bcddb2ef2134b398c"
+  integrity sha512-pJdULgUFWzhisGztYCLQTcLXMesOmR39PkjH9C2IozFpWC/MqMHs3/jArJr0EAx/YgkCjdv6IUajjGC1gMefoA==
   dependencies:
     events "^3.3.0"
     nostr-tools "^1.0.1"

@@ -1,10 +1,10 @@
 import { BottomSheetModal, BottomSheetModalProvider } from '@gorhom/bottom-sheet';
-import { ConnectURI, Metadata, NostrRPC } from '@nostr-connect/connect';
-import EventEmitter from 'events';
+import { ConnectURI, Metadata, NostrSigner } from '@nostr-connect/connect';
 import * as Clipboard from 'expo-clipboard';
 import { Event, getPublicKey, nip19, signEvent } from 'nostr-tools';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
+  Alert,
   Button,
   FlatList,
   Modal,
@@ -23,29 +23,26 @@ import { darkBlue, babyBlue } from '../constants';
 import { useAppsStore } from '../store';
 import { deleteWallet, getWallet, PRIVATE_KEY_HEX } from '../store/secure';
 
-class MobileHandler extends NostrRPC {
-  events: EventEmitter;
-
-  constructor({ secretKey }: { secretKey: string }) {
-    super({ secretKey });
-    this.events = new EventEmitter();
-  }
-
+class MobileHandler extends NostrSigner {
   async get_public_key(): Promise<string> {
     return getPublicKey(this.self.secret);
   }
 
   async sign_event(event: Event): Promise<string> {
     if (!this.event) throw new Error('No origin event');
-    this.events.emit('signEventRequest', {
-      sender: this.event.pubkey,
-      event,
-    });
+
+    // emit event to the UI to show a modal
+    this.events.emit('sign_event_request', event);
+
+    // wait for the user to approve or reject the request
     return new Promise((resolve, reject) => {
-      this.events.once('signEventApprove', () => {
+      // listen for user accept
+      this.events.on('sign_event_approve', () => {
         resolve(signEvent(event, this.self.secret));
       });
-      this.events.once('signEventReject', () => {
+
+      // or reject
+      this.events.on('sign_event_reject', () => {
         reject(new Error('User rejected request'));
       });
     });
@@ -58,13 +55,14 @@ export default function ConnectList({ navigation }: { navigation: any }) {
   const getApp = useAppsStore((state) => state.getAppByID);
   const addApp = useAppsStore((state) => state.addApp);
   const removeApps = useAppsStore((state) => state.removeApps);
+  const removeAppByID = useAppsStore((state) => state.removeAppByID);
 
   // state
   const [nostrID, setNostrID] = useState<string>();
   const [connectURI, setConnectURI] = useState<ConnectURI>();
   const [event, setEvent] = useState<Event>();
   const [metadata, setMetadata] = useState<Metadata>();
-  const [handler, setHandler] = useState<NostrRPC>();
+  const [handler, setHandler] = useState<NostrSigner>();
   const [showScanner, setScanner] = useState(false);
 
   //bottom sheet
@@ -113,20 +111,23 @@ export default function ConnectList({ navigation }: { navigation: any }) {
       } catch (err: any) {
         console.error(err);
       }
-      remoteHandler.events.on(
-        'signEventRequest',
-        ({ sender, event: evt }: { sender: string; event: Event }) => {
-          const app = getApp(sender);
-          //skip all events from unknown or not authorized apps
-          if (app) {
-            setEvent(evt);
-            setMetadata({ name: app.name, url: app.url });
-            approveSignEventModalShow();
-          }
-        }
-      );
-      remoteHandler.events.on('signEventReject', () => {
+      remoteHandler.events.on('sign_event_request', (evt: Event) => {
+        if (!remoteHandler.event || !remoteHandler.event.pubkey) return;
+        //skip all events from unknown or not authorized apps
+        const app = getApp(remoteHandler.event.pubkey);
+        if (!app) return;
+
+        setMetadata({ name: app.name, url: app.url });
+        setEvent(evt);
+
+        approveSignEventModalShow();
+      });
+      remoteHandler.events.on('sign_event_reject', () => {
         approveSignEventModalDismiss();
+      });
+      remoteHandler.events.on('disconnect', () => {
+        if (!remoteHandler.event || !remoteHandler.event.pubkey) return;
+        removeAppByID(remoteHandler.event.pubkey);
       });
       setHandler(remoteHandler);
     })();
@@ -152,27 +153,35 @@ export default function ConnectList({ navigation }: { navigation: any }) {
   const pasteFromClipboard = async () => {
     try {
       const text = await Clipboard.getStringAsync();
-      const fakePastedText = `nostr://connect?target=b889ff5b1513b641e2a139f661a661364979c5beee91842f8f0ef42ab558e9d4&metadata={"name":"Vulpem Ventures","description":"lorem ipsum dolor sit amet","url":"https://vulpem.com","icons":["https://vulpem.com/1000x860-p-500.422be1bc.png"]}&relay=wss://nostr.vulpem.com`;
-      setConnectURI(ConnectURI.fromURI(text || fakePastedText));
+      if (!text) throw new Error('No text in clipboard');
+      setConnectURI(ConnectURI.fromURI(text));
 
       inputChoiceModalDismiss();
       approveConnectModalShow();
     } catch (err: any) {
-      console.error(err);
-      alert('Invalid Connect URI');
+      Alert.alert('Error', err.message);
     }
   };
 
   const approveConnect = async () => {
+    if (!handler) return;
     if (!connectURI) return;
     // get wallet
     const key = await getWallet(PRIVATE_KEY_HEX);
     if (!key) return;
 
-    await connectURI.approve(key);
+    try {
+      await connectURI.approve(key);
+    } catch (err) {
+      console.error(err);
+      alert('Error while approving connect');
+      return;
+    }
+
+    // persist app to the list of connected ones
     addApp({
       id: connectURI.target,
-      relay: connectURI.relayURL,
+      relay: connectURI.relay,
       name: connectURI.metadata.name,
       label: connectURI.metadata.description || '',
       icons: connectURI.metadata.icons || [],
@@ -185,7 +194,7 @@ export default function ConnectList({ navigation }: { navigation: any }) {
   const approveSignEvent = async () => {
     if (!handler) return;
 
-    handler.events.emit('signEventApprove');
+    handler.events.emit('sign_event_approve');
 
     tearDownModals();
   };
@@ -219,7 +228,7 @@ export default function ConnectList({ navigation }: { navigation: any }) {
           url: app.url,
           icons: app.icons,
         },
-        relayURL: app.relay,
+        relay: app.relay,
       });
       await uri.reject(key);
     }

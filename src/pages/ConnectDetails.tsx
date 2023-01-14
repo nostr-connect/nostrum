@@ -38,7 +38,7 @@ export default function DetailsScreen({ navigation, route }: { route: any; navig
         url: app.url,
         icons: app.icons,
       },
-      relayURL: app.relay,
+      relay: app.relay,
     });
     await uri.reject(key);
     removeAppByID(app.id);
