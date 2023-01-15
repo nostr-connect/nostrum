@@ -7,10 +7,10 @@ import { useFonts, Sora_400Regular, Sora_600SemiBold } from '@expo-google-fonts/
 
 import { darkBlue } from './constants';
 
-import ConnectDetails from './pages/ConnectDetails';
-import ConnectList from './pages/ConnectList';
+import ConnectDetails from './screens/ConnectDetails';
+import ConnectList from './screens/ConnectList';
 
-import Onboarding from './pages/Onboarding';
+import Onboarding from './screens/Onboarding';
 import { StatusBar } from 'expo-status-bar';
 
 

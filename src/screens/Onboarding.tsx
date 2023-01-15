@@ -1,6 +1,15 @@
 import { generatePrivateKey } from 'nostr-tools';
 import React, { useEffect, useState } from 'react';
-import { Alert, StyleSheet, Text, TextInput, Image, View, Modal, TouchableOpacity } from 'react-native';
+import {
+  Alert,
+  StyleSheet,
+  Text,
+  TextInput,
+  Image,
+  View,
+  Modal,
+  TouchableOpacity,
+} from 'react-native';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
