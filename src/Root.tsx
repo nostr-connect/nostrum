@@ -11,7 +11,7 @@ import ConnectDetails from './pages/ConnectDetails';
 import ConnectList from './pages/ConnectList';
 
 import Onboarding from './pages/Onboarding';
-import { useCallback } from 'react';
+import { StatusBar } from 'expo-status-bar';
 
 
 
@@ -50,6 +50,7 @@ export default function Root() {
           </Stack.Navigator>
         </NavigationContainer>
       </SafeAreaProvider>
+      <StatusBar style={'light'} />
       <PolyfillCrypto />
     </GestureHandlerRootView>
   );
