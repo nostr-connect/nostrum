@@ -1,6 +1,6 @@
 import { generatePrivateKey } from 'nostr-tools';
 import React, { useEffect, useState } from 'react';
-import { Alert, StyleSheet, Text, TextInput, View, Modal, TouchableOpacity } from 'react-native';
+import { Alert, StyleSheet, Text, TextInput, Image, View, Modal, TouchableOpacity } from 'react-native';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -52,7 +52,7 @@ export default function Onboarding({ navigation }: { navigation: any }) {
     <Layout>
       <View style={styles.container}>
         <View style={styles.top}>
-          <Text style={styles.emoji}>🌊</Text>
+          <Image source={require('../../assets/logo.png')} style={{ height: 256, width: 256 }} />
         </View>
         <View style={styles.middle}>
           <TouchableOpacity onPress={joinPress} style={styles.button}>
