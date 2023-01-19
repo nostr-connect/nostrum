@@ -4,6 +4,8 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import PolyfillCrypto from 'react-native-webview-crypto';
 import { useFonts, Sora_400Regular, Sora_600SemiBold } from '@expo-google-fonts/sora';
+import * as SplashScreen from 'expo-splash-screen';
+import { StatusBar } from 'expo-status-bar';
 
 import { darkBlue } from './constants';
 
@@ -11,16 +13,22 @@ import ConnectDetails from './screens/ConnectDetails';
 import ConnectList from './screens/ConnectList';
 
 import Onboarding from './screens/Onboarding';
-import { StatusBar } from 'expo-status-bar';
+import { useCallback } from 'react';
 
-
+SplashScreen.preventAutoHideAsync();
 
 const Stack = createNativeStackNavigator();
 export default function Root() {
   let [fontsLoaded] = useFonts({ SoraRegular: Sora_400Regular, SoraBold: Sora_600SemiBold });
+  const onLayoutRootView = useCallback(async () => {
+    if (fontsLoaded) {
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      await SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
   if (!fontsLoaded) return null;
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayoutRootView}>
       <SafeAreaProvider>
         <NavigationContainer>
           <Stack.Navigator
