@@ -21,7 +21,6 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.vulpem.nostrum",
-      "buildNumber": "4",
       "config": {
         "usesNonExemptEncryption": false
       }
