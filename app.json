@@ -9,7 +9,7 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
     "splash": {
-      "image": "./assets/splash.gif",
+      "image": "./assets/splash.png",
       "backgroundColor": "#FFFFFF"
     },
     "updates": {

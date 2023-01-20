@@ -22,7 +22,6 @@ export default function Root() {
   let [fontsLoaded] = useFonts({ SoraRegular: Sora_400Regular, SoraBold: Sora_600SemiBold });
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded) {
-      await new Promise(resolve => setTimeout(resolve, 3000));
       await SplashScreen.hideAsync();
     }
   }, [fontsLoaded]);
