@@ -6,10 +6,7 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal",
-      "ios": {
-        "resourceClass": "m1-medium"
-      }
+      "distribution": "internal"
     },
     "staging": {
       "distribution": "internal",
@@ -18,10 +15,7 @@
       }
     },
     "production": {
-      "autoIncrement": true,
-      "ios": {
-        "resourceClass": "m1-medium"
-      }
+      "autoIncrement": true
     }
   },
   "submit": {
