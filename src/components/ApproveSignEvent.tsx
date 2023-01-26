@@ -33,7 +33,7 @@ const ApproveSignEvent = ({
         <Text style={styles.text}>
           ⏱ Created
           <Text style={styles.bold}>
-            {` ${new Date(event?.created_at).toLocaleString('en-US', { timeZone: 'UTC' })}`}
+            {` ${new Date(event?.created_at * 1000).toLocaleString('en-US', { timeZone: 'UTC' })}`}
           </Text>
         </Text>
         <Text style={styles.text}>

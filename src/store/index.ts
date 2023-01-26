@@ -9,6 +9,9 @@ interface AppState {
   getAppByID: (id: string) => App | undefined;
   removeAppByID: (id: string) => void;
   removeApps: () => void;
+  //internal
+  rehydrated: boolean;
+  setRehydrated: () => void;
 }
 
 interface App {
@@ -23,8 +26,10 @@ interface App {
 export const useAppsStore = create<AppState>()(
   persist(
     (set, get) => ({
+      rehydrated: false,
+      setRehydrated: () => set((state) => ({ ...state, rehydrated: true })),
       apps: [],
-      addApp: (app: App): void => set((state) => ({ apps: [...state.apps, app] })),
+      addApp: (app: App): void => set((state) => ({ ...state, apps: [...state.apps, app] })),
       getAppByID: (id: string): App | undefined => {
         const app = get().apps.find((app) => app.id === id);
         return app;
@@ -38,6 +43,15 @@ export const useAppsStore = create<AppState>()(
     {
       name: 'food-storage', // unique name
       storage: createJSONStorage(() => ZustandAsyncStorage),
+      onRehydrateStorage: (state) => {
+        return (state, error) => {
+          if (error || !state) {
+            console.log('an error happened during hydration', error);
+          } else {
+            state.setRehydrated();
+          }
+        };
+      },
     }
   )
 );

@@ -199,6 +199,14 @@ export default function ConnectList({ navigation }: { navigation: any }) {
     tearDownModals();
   };
 
+  const rejectSignEvent = async () => {
+    if (!handler) return;
+
+    handler.events.emit('sign_event_reject');
+
+    tearDownModals();
+  };
+
   const keyInfoPress = () => {
     keyInfoModalShow();
   };
@@ -350,10 +358,7 @@ export default function ConnectList({ navigation }: { navigation: any }) {
               url={metadata.url}
               event={event}
               onApprove={approveSignEvent}
-              onReject={() => {
-                if (!handler) return;
-                handler.events.emit('signEventReject');
-              }}
+              onReject={rejectSignEvent}
             />
           </BottomSheetModal>
         )}

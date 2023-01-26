@@ -14,14 +14,18 @@ import ConnectList from './screens/ConnectList';
 
 import Onboarding from './screens/Onboarding';
 import { useCallback } from 'react';
+import { useAppsStore } from './store';
 
 SplashScreen.preventAutoHideAsync();
 
 const Stack = createNativeStackNavigator();
 export default function Root() {
-  let [fontsLoaded] = useFonts({ SoraRegular: Sora_400Regular, SoraBold: Sora_600SemiBold });
+  const isRehydrated = useAppsStore((state) => state.rehydrated);
+  const [fontsLoaded] = useFonts({ SoraRegular: Sora_400Regular, SoraBold: Sora_600SemiBold });
   const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
+    if (fontsLoaded && isRehydrated) {
+      // wait to hide splash screen
+      await new Promise((resolve) => setTimeout(resolve, 1500));
       await SplashScreen.hideAsync();
     }
   }, [fontsLoaded]);

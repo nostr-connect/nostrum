@@ -10,7 +10,8 @@
     "userInterfaceStyle": "dark",
     "splash": {
       "image": "./assets/splash.png",
-      "backgroundColor": "#FFFFFF"
+      "backgroundColor": "#050A30",
+      "resizeMode": "cover"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
