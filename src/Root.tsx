@@ -39,9 +39,11 @@ export default function Root() {
               headerTintColor: 'white',
               headerStyle: { backgroundColor: darkBlue },
             }}>
-            <Stack.Screen name="Onboarding" options={{ 
-              headerShown: false,
-             }}>
+            <Stack.Screen
+              name="Onboarding"
+              options={{
+                headerShown: false,
+              }}>
               {(props) => <Onboarding {...props} />}
             </Stack.Screen>
             <Stack.Screen
@@ -51,12 +53,14 @@ export default function Root() {
               }}>
               {(props) => <ConnectList {...props} />}
             </Stack.Screen>
-            <Stack.Screen name="Details"  options={{
-              headerBackTitleStyle: { fontFamily: 'SoraRegular', fontSize: 16 },
-              headerBackTitle: 'Apps',
-              headerTitleStyle: { fontFamily: 'SoraBold', fontSize: 16 },
-            }}>
-              {(props) => <ConnectDetails {...props}/>}
+            <Stack.Screen
+              name="Details"
+              options={{
+                headerBackTitleStyle: { fontFamily: 'SoraRegular', fontSize: 16 },
+                headerBackTitle: 'Apps',
+                headerTitleStyle: { fontFamily: 'SoraBold', fontSize: 16 },
+              }}>
+              {(props) => <ConnectDetails {...props} />}
             </Stack.Screen>
           </Stack.Navigator>
         </NavigationContainer>
