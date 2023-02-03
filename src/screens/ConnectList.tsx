@@ -27,9 +27,6 @@ import { useAppsStore } from '../store';
 import { deleteWallet, getWallet, PRIVATE_KEY_HEX } from '../store/secure';
 
 class MobileHandler extends NostrSigner {
-  async ping(): Promise<string> {
-    return 'pong';
-  }
 
   async get_public_key(): Promise<string> {
     return getPublicKey(this.self.secret);
