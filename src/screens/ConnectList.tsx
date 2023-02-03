@@ -1,4 +1,6 @@
 import { BottomSheetModal, BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import { sha256 } from '@noble/hashes/sha256';
+import * as secp256k1 from '@noble/secp256k1';
 import { ConnectURI, Metadata, NostrSigner } from '@nostr-connect/connect';
 import * as Clipboard from 'expo-clipboard';
 import { Event, getPublicKey, nip19, signEvent } from 'nostr-tools';
@@ -17,6 +19,7 @@ import {
 
 import AppRow from '../components/AppRow';
 import ApproveSignEvent from '../components/ApproveSignEvent';
+import ApproveSignSchnorr from '../components/ApproveSignSchnorr';
 import { Layout } from '../components/Layout';
 import Scanner from '../components/Scanner';
 import { darkBlue, babyBlue } from '../constants';
@@ -24,6 +27,10 @@ import { useAppsStore } from '../store';
 import { deleteWallet, getWallet, PRIVATE_KEY_HEX } from '../store/secure';
 
 class MobileHandler extends NostrSigner {
+  async ping(): Promise<string> {
+    return 'pong';
+  }
+
   async get_public_key(): Promise<string> {
     return getPublicKey(this.self.secret);
   }
@@ -47,6 +54,30 @@ class MobileHandler extends NostrSigner {
       });
     });
   }
+
+  async sign_schnorr(message: string): Promise<string> {
+    if (!this.event) throw new Error('No origin event');
+
+    // emit event to the UI to show a modal
+    this.events.emit('sign_schnorr_request', message);
+
+    // wait for the user to approve or reject the request
+    return new Promise((resolve, reject) => {
+      // listen for user accept
+      this.events.on('sign_schnorr_approve', async () => {
+        const hash = sha256(message);
+        const sig = await secp256k1.schnorr.sign(hash, this.self.secret);
+        const hex = secp256k1.utils.bytesToHex(sig);
+
+        resolve(hex);
+      });
+
+      // or reject
+      this.events.on('sign_schnorr_reject', () => {
+        reject(new Error('User rejected request'));
+      });
+    });
+  }
 }
 
 export default function ConnectList({ navigation }: { navigation: any }) {
@@ -61,6 +92,7 @@ export default function ConnectList({ navigation }: { navigation: any }) {
   const [nostrID, setNostrID] = useState<string>();
   const [connectURI, setConnectURI] = useState<ConnectURI>();
   const [event, setEvent] = useState<Event>();
+  const [signSchnorrMessage, setSignSchnorrMessage] = useState<string>();
   const [metadata, setMetadata] = useState<Metadata>();
   const [handler, setHandler] = useState<NostrSigner>();
   const [showScanner, setScanner] = useState(false);
@@ -70,11 +102,13 @@ export default function ConnectList({ navigation }: { navigation: any }) {
   const snapPointsChoice = useMemo(() => ['10%', '20%'], []);
   const snapPointsApproveConnect = useMemo(() => ['10%', '40%'], []);
   const snapPointsApproveSignEvent = useMemo(() => ['10%', '80%'], []);
+  const snapPointsApproveSignSchnorr = useMemo(() => ['20%', '80%'], []);
 
   const keyInfoModalRef = useRef<BottomSheetModal>(null);
   const inputChoiceModalRef = useRef<BottomSheetModal>(null);
   const approveConnectModalRef = useRef<BottomSheetModal>(null);
   const approveSignEventModalRef = useRef<BottomSheetModal>(null);
+  const approveSignSchnorrModalRef = useRef<BottomSheetModal>(null);
 
   const keyInfoModalShow = () => keyInfoModalRef.current && keyInfoModalRef.current.present();
   const inputChoiceModalShow = () =>
@@ -89,6 +123,10 @@ export default function ConnectList({ navigation }: { navigation: any }) {
     approveSignEventModalRef.current && approveSignEventModalRef.current.present();
   const approveSignEventModalDismiss = () =>
     approveSignEventModalRef.current && approveSignEventModalRef.current.dismiss();
+  const approveSignSchnorrModalShow = () =>
+    approveSignSchnorrModalRef.current && approveSignSchnorrModalRef.current.present();
+  const approveSignSchnorrModalDismiss = () =>
+    approveSignSchnorrModalRef.current && approveSignSchnorrModalRef.current.dismiss();
 
   useEffect(() => {
     (async () => {
@@ -122,9 +160,24 @@ export default function ConnectList({ navigation }: { navigation: any }) {
 
         approveSignEventModalShow();
       });
+      remoteHandler.events.on('sign_schnorr_request', (message: string) => {
+        if (!remoteHandler.event || !remoteHandler.event.pubkey) return;
+        //skip all events from unknown or not authorized apps
+        const app = getApp(remoteHandler.event.pubkey);
+        if (!app) return;
+
+        setMetadata({ name: app.name, url: app.url });
+        setSignSchnorrMessage(message);
+
+        approveSignSchnorrModalShow();
+      });
       remoteHandler.events.on('sign_event_reject', () => {
         approveSignEventModalDismiss();
       });
+      remoteHandler.events.on('sign_schnorr_reject', () => {
+        approveSignSchnorrModalDismiss();
+      });
+
       remoteHandler.events.on('disconnect', () => {
         if (!remoteHandler.event || !remoteHandler.event.pubkey) return;
         removeAppByID(remoteHandler.event.pubkey);
@@ -203,6 +256,22 @@ export default function ConnectList({ navigation }: { navigation: any }) {
     if (!handler) return;
 
     handler.events.emit('sign_event_reject');
+
+    tearDownModals();
+  };
+
+  const approveSignSchnorr = async () => {
+    if (!handler) return;
+
+    handler.events.emit('sign_schnorr_approve');
+
+    tearDownModals();
+  };
+
+  const rejectSignSchnorr = async () => {
+    if (!handler) return;
+
+    handler.events.emit('sign_schnorr_reject');
 
     tearDownModals();
   };
@@ -359,6 +428,20 @@ export default function ConnectList({ navigation }: { navigation: any }) {
               event={event}
               onApprove={approveSignEvent}
               onReject={rejectSignEvent}
+            />
+          </BottomSheetModal>
+        )}
+        {signSchnorrMessage && metadata && (
+          <BottomSheetModal
+            ref={approveSignSchnorrModalRef}
+            index={1}
+            snapPoints={snapPointsApproveSignSchnorr}>
+            <ApproveSignSchnorr
+              name={metadata.name}
+              url={metadata.url}
+              message={signSchnorrMessage}
+              onApprove={approveSignSchnorr}
+              onReject={rejectSignSchnorr}
             />
           </BottomSheetModal>
         )}
