@@ -445,17 +445,19 @@ export default function ConnectList({ navigation }: { navigation: any }) {
           <BottomSheetModal index={1} ref={keyInfoModalRef} snapPoints={snapPointsKeyInfo}>
             <View style={styles.keyInfo}>
               <Text style={styles.keyInfoTitle}>Nostr ID</Text>
-              <TouchableOpacity onPress={async () => await Clipboard.setStringAsync(nip19.npubEncode(nostrID))}>
+              <TouchableOpacity
+                onPress={async () => await Clipboard.setStringAsync(nip19.npubEncode(nostrID))}>
                 <Text style={styles.keyInfoText}>{nip19.npubEncode(nostrID)}</Text>
               </TouchableOpacity>
 
               {handler && (
                 <>
                   <Text style={styles.keyInfoTitle}>Secret</Text>
-                  <TouchableOpacity onPress={async () => await Clipboard.setStringAsync(nip19.nsecEncode(handler.self.secret))}>
-                    <Text style={styles.keyInfoText}>
-                      {`********************************`}
-                    </Text>
+                  <TouchableOpacity
+                    onPress={async () =>
+                      await Clipboard.setStringAsync(nip19.nsecEncode(handler.self.secret))
+                    }>
+                    <Text style={styles.keyInfoText}>********************************</Text>
                   </TouchableOpacity>
                 </>
               )}
