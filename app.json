@@ -8,6 +8,7 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
+    "owner": "nostr-connect",
     "splash": {
       "image": "./assets/splash.png",
       "backgroundColor": "#050A30",
