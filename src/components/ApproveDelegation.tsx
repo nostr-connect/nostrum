@@ -1,48 +1,50 @@
-import { Event } from 'nostr-tools';
+import { nip19, nip26 } from 'nostr-tools';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 
 import { babyBlue, darkBlue } from '../constants';
 
-const ApproveSignEvent = ({
+const ApproveDelegation = ({
   name,
   url,
   onApprove,
   onReject,
-  event,
+  delegation,
 }: {
   name: string;
   url: string;
-  event: Event;
   onApprove: () => void;
   onReject: () => void;
+  delegation: nip26.Parameters;
 }) => (
   <View style={styles.container}>
     <View style={{ flexDirection: 'column' }}>
       <View style={{ alignItems: 'center' }}>
         <Text style={styles.host}>🌎 {new URL(url).hostname}</Text>
         <Text style={styles.title}>{name}</Text>
-        <Text style={styles.subtitle}> wants you to sign this event</Text>
+        <Text style={styles.subtitle}> wants you to sign a delegation</Text>
       </View>
       <ScrollView>
         <Text style={styles.text}>
-          📋 Kind
-          <Text style={styles.bold}>{` ${event?.kind}`}</Text>
+          🙋‍♂️ Delegatee
+          <Text style={styles.bold}>{` ${nip19.npubEncode(delegation.pubkey)}`}</Text>
         </Text>
         <Text style={styles.text}>
-          ⏱ Created
+          📋 Kind
+          <Text style={styles.bold}>{` ${delegation.kind}`}</Text>
+        </Text>
+        <Text style={styles.text}>
+          ⏱ Since
           <Text style={styles.bold}>
-            {` ${new Date(event?.created_at * 1000).toLocaleString('en-US', { timeZone: 'UTC' })}`}
+            {` ${new Date(delegation.since! * 1000).toLocaleString('en-US', { timeZone: 'UTC' })}`}
           </Text>
         </Text>
         <Text style={styles.text}>
-          👩‍🦱 Signed by
-          <Text style={styles.bold}>{` myself`}</Text>
-        </Text>
-        <Text style={styles.text}>
-          📝 Content
-          <Text style={styles.bold}>{` ${event.content}`}</Text>
+          ⏰ Until
+          <Text style={styles.bold}>
+            {` ${new Date(delegation.until! * 1000).toLocaleString('en-US', { timeZone: 'UTC' })}`}
+          </Text>
         </Text>
       </ScrollView>
       <View style={styles.buttons}>
@@ -118,4 +120,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ApproveSignEvent;
+export default ApproveDelegation;
