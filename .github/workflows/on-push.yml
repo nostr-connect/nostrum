@@ -25,7 +25,7 @@ jobs:
         run: yarn install
 
       - name: 🚀 Build app ios
-        run: eas build --non-interactive --platform ios 
+        run: eas build --no-wait --non-interactive --platform ios 
       
       - name: 🚀 Build app android
-        run: eas build --non-interactive --platform android --profile staging
+        run: eas build --no-wait --non-interactive --platform android --profile staging
