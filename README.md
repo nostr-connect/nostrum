@@ -4,7 +4,7 @@ Keep your Nostr keys safe.
 ## ⛹️‍♀️ Try now!
 
 - [iOS TestFlight](https://testflight.apple.com/join/JIbjvN2p)
-- [Android APK](https://expo.dev/accounts/tiero/projects/nostrum/builds/367f1e14-234e-4722-9a9e-aa63162f1b2f)
+- [Android APK](https://expo.dev/accounts/nostr-connect/projects/nostrum/builds/5a72132e-6545-4c85-aee7-9b702c681e61)
 
 ## 🎬 Demo
 https://user-images.githubusercontent.com/3596602/211125690-a16d0d3d-d010-44b2-85e3-94b4e9f476c7.mp4
