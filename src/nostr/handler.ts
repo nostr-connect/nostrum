@@ -5,9 +5,9 @@ import { getPublicKey, signEvent, Event } from 'nostr-tools';
 
 export default class NostrConnectHandler extends NostrSigner {
   async describe(): Promise<string[]> {
-    return ["describe", "get_public_key", "sign_event"];
+    return ['describe', 'get_public_key', 'sign_event'];
   }
-  
+
   async get_public_key(): Promise<string> {
     return getPublicKey(this.self.secret);
   }

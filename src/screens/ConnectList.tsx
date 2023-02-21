@@ -21,9 +21,9 @@ import ApproveSignSchnorr from '../components/ApproveSignSchnorr';
 import { Layout } from '../components/Layout';
 import Scanner from '../components/Scanner';
 import { darkBlue, babyBlue } from '../constants';
+import NostrConnectHandler from '../nostr/handler';
 import { useAppsStore } from '../store';
 import { deleteWallet, getWallet, PRIVATE_KEY_HEX } from '../store/secure';
-import NostrConnectHandler from '../nostr/handler';
 
 export default function ConnectList({ navigation }: { navigation: any }) {
   //store
