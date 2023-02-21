@@ -1,7 +1,7 @@
 import { BottomSheetModal, BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { ConnectURI, Metadata, NostrSigner } from '@nostr-connect/connect';
 import * as Clipboard from 'expo-clipboard';
-import { Event, getPublicKey, nip19 } from 'nostr-tools';
+import { Event, getPublicKey, nip19, nip26 } from 'nostr-tools';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Alert,
@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 
 import AppRow from '../components/AppRow';
+import ApproveDelegation from '../components/ApproveDelegation';
 import ApproveSignEvent from '../components/ApproveSignEvent';
 import ApproveSignSchnorr from '../components/ApproveSignSchnorr';
 import { Layout } from '../components/Layout';
@@ -34,24 +35,27 @@ export default function ConnectList({ navigation }: { navigation: any }) {
   const removeAppByID = useAppsStore((state) => state.removeAppByID);
 
   // state
-  const [nostrID, setNostrID] = useState<string>();
-  const [connectURI, setConnectURI] = useState<ConnectURI>();
   const [event, setEvent] = useState<Event>();
-  const [signSchnorrMessage, setSignSchnorrMessage] = useState<string>();
+  const [delegation, setDelegation] = useState<nip26.Parameters>();
+  const [nostrID, setNostrID] = useState<string>();
+  const [showScanner, setScanner] = useState(false);
   const [metadata, setMetadata] = useState<Metadata>();
   const [handler, setHandler] = useState<NostrSigner>();
-  const [showScanner, setScanner] = useState(false);
+  const [connectURI, setConnectURI] = useState<ConnectURI>();
+  const [signSchnorrMessage, setSignSchnorrMessage] = useState<string>();
 
   //bottom sheet
-  const snapPointsKeyInfo = useMemo(() => ['10%', '70%'], []);
   const snapPointsChoice = useMemo(() => ['10%', '20%'], []);
+  const snapPointsKeyInfo = useMemo(() => ['10%', '70%'], []);
   const snapPointsApproveConnect = useMemo(() => ['10%', '40%'], []);
+  const snapPointsApproveDelegate = useMemo(() => ['10%', '80%'], []);
   const snapPointsApproveSignEvent = useMemo(() => ['10%', '80%'], []);
   const snapPointsApproveSignSchnorr = useMemo(() => ['20%', '80%'], []);
 
   const keyInfoModalRef = useRef<BottomSheetModal>(null);
   const inputChoiceModalRef = useRef<BottomSheetModal>(null);
   const approveConnectModalRef = useRef<BottomSheetModal>(null);
+  const approveDelegateModalRef = useRef<BottomSheetModal>(null);
   const approveSignEventModalRef = useRef<BottomSheetModal>(null);
   const approveSignSchnorrModalRef = useRef<BottomSheetModal>(null);
 
@@ -72,6 +76,10 @@ export default function ConnectList({ navigation }: { navigation: any }) {
     approveSignSchnorrModalRef.current && approveSignSchnorrModalRef.current.present();
   const approveSignSchnorrModalDismiss = () =>
     approveSignSchnorrModalRef.current && approveSignSchnorrModalRef.current.dismiss();
+  const approveDelegateModalShow = () =>
+    approveDelegateModalRef.current && approveDelegateModalRef.current.present();
+  const approveDelegateModalDismiss = () =>
+    approveDelegateModalRef.current && approveDelegateModalRef.current.dismiss();
 
   useEffect(() => {
     (async () => {
@@ -94,6 +102,8 @@ export default function ConnectList({ navigation }: { navigation: any }) {
       } catch (err: any) {
         console.error(err);
       }
+
+      // handle requests
       remoteHandler.events.on('sign_event_request', (evt: Event) => {
         if (!remoteHandler.event || !remoteHandler.event.pubkey) return;
         //skip all events from unknown or not authorized apps
@@ -116,11 +126,26 @@ export default function ConnectList({ navigation }: { navigation: any }) {
 
         approveSignSchnorrModalShow();
       });
+      remoteHandler.events.on('delegate_request', (delegation: nip26.Parameters) => {
+        if (!remoteHandler.event || !remoteHandler.event.pubkey) return;
+        //skip all events from unknown or not authorized apps
+        const app = getApp(remoteHandler.event.pubkey);
+        if (!app) return;
+
+        setMetadata({ name: app.name, url: app.url });
+        setDelegation(delegation);
+        approveDelegateModalShow();
+      });
+
+      // rejections
       remoteHandler.events.on('sign_event_reject', () => {
         approveSignEventModalDismiss();
       });
       remoteHandler.events.on('sign_schnorr_reject', () => {
         approveSignSchnorrModalDismiss();
+      });
+      remoteHandler.events.on('delegate_reject', () => {
+        approveDelegateModalDismiss();
       });
 
       remoteHandler.events.on('disconnect', () => {
@@ -217,6 +242,22 @@ export default function ConnectList({ navigation }: { navigation: any }) {
     if (!handler) return;
 
     handler.events.emit('sign_schnorr_reject');
+
+    tearDownModals();
+  };
+
+  const approveDelegate = async () => {
+    if (!handler) return;
+
+    handler.events.emit('delegate_approve');
+
+    tearDownModals();
+  };
+
+  const rejectDelegate = async () => {
+    if (!handler) return;
+
+    handler.events.emit('delegate_reject');
 
     tearDownModals();
   };
@@ -387,6 +428,20 @@ export default function ConnectList({ navigation }: { navigation: any }) {
               message={signSchnorrMessage}
               onApprove={approveSignSchnorr}
               onReject={rejectSignSchnorr}
+            />
+          </BottomSheetModal>
+        )}
+        {delegation && metadata && (
+          <BottomSheetModal
+            ref={approveDelegateModalRef}
+            index={1}
+            snapPoints={snapPointsApproveDelegate}>
+            <ApproveDelegation
+              name={metadata.name}
+              url={metadata.url}
+              delegation={delegation}
+              onApprove={approveDelegate}
+              onReject={rejectDelegate}
             />
           </BottomSheetModal>
         )}
