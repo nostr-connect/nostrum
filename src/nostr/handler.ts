@@ -2,6 +2,7 @@ import { sha256 } from '@noble/hashes/sha256';
 import * as secp256k1 from '@noble/secp256k1';
 import { NostrSigner } from '@nostr-connect/connect';
 import { getPublicKey, signEvent, Event, nip26 } from 'nostr-tools';
+import { Delegation } from 'nostr-tools/nip26';
 
 export default class NostrConnectHandler extends NostrSigner {
   async describe(): Promise<string[]> {
@@ -39,7 +40,7 @@ export default class NostrConnectHandler extends NostrSigner {
       until?: number;
       since?: number;
     }
-  ): Promise<string> {
+  ): Promise<Delegation> {
     if (!this.event) throw new Error('No origin event');
     if (!delegatee) throw new Error('No delegatee pubkey provided');
     if (!conditions) throw new Error('No conditions provided');
@@ -61,7 +62,7 @@ export default class NostrConnectHandler extends NostrSigner {
       // listen for user accept
       this.events.on('delegate_approve', async () => {
         const delegation = nip26.createDelegation(this.self.secret, delegateParameters);
-        resolve(delegation.sig);
+        resolve(delegation);
       });
 
       // or reject
