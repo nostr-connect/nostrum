@@ -2,7 +2,7 @@ import { sha256 } from '@noble/hashes/sha256';
 import * as secp256k1 from '@noble/secp256k1';
 import { NostrSigner } from '@nostr-connect/connect';
 import { getPublicKey, signEvent, Event, nip26 } from 'nostr-tools';
-import { Delegation } from 'nostr-tools/nip26';
+import type { Delegation } from 'nostr-tools/nip26';
 
 export default class NostrConnectHandler extends NostrSigner {
   async describe(): Promise<string[]> {
