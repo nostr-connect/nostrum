@@ -81,7 +81,8 @@ export default class NostrConnectHandler extends NostrSigner {
     return new Promise((resolve, reject) => {
       // listen for user accept
       this.events.on('sign_schnorr_approve', async () => {
-        const sig = await secp256k1.schnorr.sign(message, this.self.secret);
+        const msgHash = await secp256k1.utils.sha256(Buffer.from(message));
+        const sig = await secp256k1.schnorr.sign(msgHash, this.self.secret);
         const hex = secp256k1.utils.bytesToHex(sig);
 
         resolve(hex);
