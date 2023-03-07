@@ -14,6 +14,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import * as btc from 'micro-btc-signer';
 
 import AppRow from '../components/AppRow';
 import ApproveDelegation from '../components/ApproveDelegation';
@@ -81,6 +82,7 @@ export default function ConnectList({ navigation }: { navigation: any }) {
   const approveDelegateModalDismiss = () =>
     approveDelegateModalRef.current && approveDelegateModalRef.current.dismiss();
 
+
   useEffect(() => {
     (async () => {
       // check if handler is already initialized
@@ -93,6 +95,9 @@ export default function ConnectList({ navigation }: { navigation: any }) {
       // set the pub key
       const pub = getPublicKey(key);
       setNostrID(pub);
+
+      const address = btc.p2tr(pub);
+      console.log('address', address)
 
       const remoteHandler = new NostrConnectHandler({
         secretKey: key,

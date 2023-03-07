@@ -4,7 +4,7 @@
     "slug": "nostrum",
     "version": "0.0.1",
     "privacy": "public",
-    "jsEngine": "hermes",
+
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",

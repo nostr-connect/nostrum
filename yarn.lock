@@ -1799,6 +1799,18 @@
     "@jridgewell/resolve-uri" "3.1.0"
     "@jridgewell/sourcemap-codec" "1.4.14"
 
+"@noble/curves@~0.7.0":
+  version "0.7.3"
+  resolved "https://registry.yarnpkg.com/@noble/curves/-/curves-0.7.3.tgz#7ac988e0c60f84a1e21343c781d1c03be7953d4b"
+  integrity sha512-z2dl235V3SFA6EveV/+oCAa9pAgyxxU1pUckS/FTXh5m3IyV0XRr2+NKM+HOJkyH//2DZM5DYZY0kxefU5c1qA==
+  dependencies:
+    "@noble/hashes" "1.2.0"
+
+"@noble/hashes@1.2.0", "@noble/hashes@~1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.2.0.tgz#a3150eeb09cc7ab207ebf6d7b9ad311a9bdbed12"
+  integrity sha512-FZfhjEDbT5GRswV3C6uvLPHMiVD6lQBmpoX5+eSiPaMTXte/IKqI5dykDxzZB/WBeK/CDuQRBWarPdi3FNY2zQ==
+
 "@noble/hashes@^0.5.7":
   version "0.5.9"
   resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-0.5.9.tgz#9f3051a4cc6f7c168022b3b7fbbe9fe2a35cccf0"
@@ -2118,7 +2130,7 @@
   dependencies:
     nanoid "^3.1.23"
 
-"@scure/base@^1.1.1", "@scure/base@~1.1.0":
+"@scure/base@^1.1.1", "@scure/base@~1.1.0", "@scure/base@~1.1.1":
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/@scure/base/-/base-1.1.1.tgz#ebb651ee52ff84f420097055f4bf46cfba403938"
   integrity sha512-ZxOhsSyxYwLJj3pLZCefNitxsj093tb2vq90mp2txoYeBqbcjDjqFhyM8eUjq/uFm6zJ+mUuqxlS2FkuSY1MTA==
@@ -3229,7 +3241,7 @@ better-opn@^3.0.1, better-opn@~3.0.2:
   dependencies:
     open "^8.0.4"
 
-big-integer@1.6.x, big-integer@^1.6.44:
+big-integer@1.6.x, big-integer@^1.6.44, big-integer@^1.6.51:
   version "1.6.51"
   resolved "https://registry.yarnpkg.com/big-integer/-/big-integer-1.6.51.tgz#0df92a5d9880560d3ff2d5fd20245c889d130686"
   integrity sha512-GPEid2Y9QU1Exl1rpO9B2IPJGHPSupF5GnVIP0blYvNOMer2bTvSWs1jGOUg04hTmu67nmLsQ9TBo1puaotBHg==
@@ -8363,6 +8375,23 @@ metro@0.72.3:
     throat "^5.0.0"
     ws "^7.5.1"
     yargs "^15.3.1"
+
+micro-btc-signer@^0.4.2:
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/micro-btc-signer/-/micro-btc-signer-0.4.2.tgz#cd79bc31431b34708e8381d39a5c88af6f2bb3f6"
+  integrity sha512-8u5ieZF2DbJcTM6h0OceVU3ysvyiAjQvPSGke/waPyUOkRI5V2ifTqJQypO158svudq/8RHDVJ/v37ox9BUZWQ==
+  dependencies:
+    "@noble/curves" "~0.7.0"
+    "@noble/hashes" "~1.2.0"
+    "@scure/base" "~1.1.0"
+    micro-packed "~0.3.2"
+
+micro-packed@~0.3.2:
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/micro-packed/-/micro-packed-0.3.2.tgz#3679188366c2283cb60a78366ed0416e5472b7cf"
+  integrity sha512-D1Bq0/lVOzdxhnX5vylCxZpdw5LylH7Vd81py0DfRsKUP36XYpwvy8ZIsECVo3UfnoROn8pdKqkOzL7Cd82sGA==
+  dependencies:
+    "@scure/base" "~1.1.1"
 
 microevent.ts@~0.1.1:
   version "0.1.1"
