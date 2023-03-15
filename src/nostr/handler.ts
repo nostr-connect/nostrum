@@ -1,6 +1,6 @@
 import * as secp256k1 from '@noble/secp256k1';
 import { NostrSigner } from '@nostr-connect/connect';
-import { getPublicKey, signEvent, Event, nip26 } from 'nostr-tools';
+import { getPublicKey, signEvent, Event, nip26, getEventHash } from 'nostr-tools';
 import type { Delegation } from 'nostr-tools/nip26';
 
 export default class NostrConnectHandler extends NostrSigner {
@@ -12,7 +12,7 @@ export default class NostrConnectHandler extends NostrSigner {
     return getPublicKey(this.self.secret);
   }
 
-  async sign_event(event: Event): Promise<string> {
+  async sign_event(event: Event): Promise<Event> {
     if (!this.event) throw new Error('No origin event');
 
     // emit event to the UI to show a modal
@@ -22,7 +22,9 @@ export default class NostrConnectHandler extends NostrSigner {
     return new Promise((resolve, reject) => {
       // listen for user accept
       this.events.on('sign_event_approve', () => {
-        resolve(signEvent(event, this.self.secret));
+        event.id = getEventHash(event);
+        event.sig = signEvent(event, this.self.secret);
+        resolve(event);
       });
 
       // or reject
