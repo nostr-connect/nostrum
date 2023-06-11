@@ -5,7 +5,7 @@ import type { Delegation } from 'nostr-tools/nip26';
 
 export default class NostrConnectHandler extends NostrSigner {
   async describe(): Promise<string[]> {
-    return ['describe', 'get_public_key', 'sign_event'];
+    return ['describe', 'get_public_key', 'sign_event', 'sign_schnorr', 'delegate'];
   }
 
   async get_public_key(): Promise<string> {

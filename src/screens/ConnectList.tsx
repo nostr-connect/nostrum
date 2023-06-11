@@ -95,6 +95,7 @@ export default function ConnectList({ navigation }: { navigation: any }) {
       setNostrID(pub);
 
       const remoteHandler = new NostrConnectHandler({
+        relay: 'wss://nostr.vulpem.com',
         secretKey: key,
       });
       try {
