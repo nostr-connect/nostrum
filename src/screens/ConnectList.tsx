@@ -156,17 +156,21 @@ export default function ConnectList({ navigation }: { navigation: any }) {
     })();
   }, [navigation, handler]);
 
+  useEffect(() => {
+    if (!connectURI) return;
+    approveConnectModalShow();
+  }, [connectURI]);
+
   const scanQRCode = () => {
     inputChoiceModalDismiss();
     setScanner(true);
   };
 
   const handleBarCodeScanned = ({ data }: { type: string; data: string }) => {
+    setScanner(false);
     try {
       const uri = ConnectURI.fromURI(data);
       setConnectURI(uri);
-      setScanner(false);
-      approveConnectModalShow();
     } catch (err: any) {
       console.error(err);
       alert('Invalid Connect URI');
@@ -174,13 +178,11 @@ export default function ConnectList({ navigation }: { navigation: any }) {
   };
 
   const pasteFromClipboard = async () => {
+    inputChoiceModalDismiss();
     try {
       const text = await Clipboard.getStringAsync();
       if (!text) throw new Error('No text in clipboard');
       setConnectURI(ConnectURI.fromURI(text));
-
-      inputChoiceModalDismiss();
-      approveConnectModalShow();
     } catch (err: any) {
       Alert.alert('Error', err.message);
     }
